@@ -3,7 +3,7 @@ name: react-craft:build
 description: Build a React component from a Figma design spec using the react-craft agent pipeline
 argument-hint: "<figma-link> [--best-effort] [--resume <ComponentName>]"
 disable-model-invocation: true
-allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Skill, Agent
+allowed-tools: Read, Write, Edit, Bash(npx *), Bash(npm *), Glob, Grep, Skill
 ---
 
 # Build Pipeline
@@ -49,11 +49,7 @@ If `--resume` is set:
 
 ### 1c. Concurrent pipeline guard
 
-Check for any `pipeline-state.yaml` files with `status: in-progress`:
-
-```bash
-grep -rl 'status: in-progress' docs/react-craft/components/*/pipeline-state.yaml 2>/dev/null
-```
+Use the Glob tool to find `pipeline-state.yaml` files, then Read each one and check for `status: in-progress`.
 
 If found:
 
@@ -217,7 +213,7 @@ If Quality Gate reports **FAIL**:
 
 ### 4b. Bail on identical failures
 
-Compare the current failure errors with the previous attempt's errors. If the error signatures are identical (same files, same line numbers, same error codes), skip remediation and go to Step 4c.
+Compare the current failure errors with the previous attempt's errors. If the error signatures are identical (same files, same line numbers, same error codes), skip remediation and go to Step 4d (terminal state).
 
 ### 4c. Re-invoke Code Writer
 

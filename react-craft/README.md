@@ -79,7 +79,9 @@ When `--best-effort` is set, the pipeline runs autonomously without stopping for
 | Figma link lacks node-id | Continue with warning |
 | Brief has pending items | Mark as assumed with reasoning |
 | Git branch already exists | Reuse existing branch |
+| Artifact hash mismatch on resume | Continue with warning |
 | Quality Gate fails | Attempt remediation (max 3 tries) |
+| Concurrent pipeline detected | Warn and stop (never override — data safety) |
 
 This is useful for batch workflows or when you trust the pipeline's judgment.
 
@@ -89,6 +91,7 @@ This is useful for batch workflows or when you trust the pipeline's judgment.
 - **Path canonicalization** — All output paths are validated to stay within the project directory
 - **Prompt injection defense** — Figma-sourced text is wrapped in `[FIGMA_DATA]` delimiters so agents distinguish design data from instructions
 - **Artifact integrity** — SHA-256 hashes verify pipeline artifacts haven't been tampered with between agent steps
+- **Script execution** — react-craft executes user-defined scripts from package.json (lint, format, typecheck) during quality checks. These run with your shell's permissions. Review scripts during `/react-craft:init` when prompted
 
 ## Known Limitations (v0.1)
 

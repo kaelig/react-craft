@@ -3,7 +3,7 @@ name: react-craft:init
 description: Initialize a react-craft project — detects codebase conventions, writes config, and sets up CLAUDE.md instructions. Use when setting up react-craft in a new React project.
 argument-hint: "[--defaults] [--scope=src/components]"
 disable-model-invocation: true
-allowed-tools: Read, Bash, Write, Edit, Glob, Grep
+allowed-tools: Read, Bash(node *), Bash(npm *), Bash(npx *), Write, Edit, Glob, Grep
 ---
 
 # Initialize React Craft
@@ -364,7 +364,7 @@ This project uses [react-craft](https://github.com/anthropics/react-craft) for c
 
 ### Quick Commands
 - `/react-craft:build <ComponentName>` — Run the full agent pipeline for a component
-- `/react-craft:audit` — Validate existing components against conventions
+- `/react-craft:audit` — Validate existing components against conventions (coming in v0.2)
 - `/react-craft:init` — Re-detect project conventions and update config
 
 ### Conventions
@@ -374,7 +374,7 @@ This project uses [react-craft](https://github.com/anthropics/react-craft) for c
 - Ref pattern: **[REF_PATTERN]**
 
 ### After Editing Components
-When you edit any `.tsx`, `.jsx`, `.css`, or `.scss` file in `[SCOPE_DIR]`, consider running `/react-craft:audit` to validate against design system conventions.
+When you edit any `.tsx`, `.jsx`, `.css`, or `.scss` file in `[SCOPE_DIR]`, consider running `/react-craft:build` to generate or regenerate components from Figma specs.
 <!-- react-craft:end -->
 ```
 
