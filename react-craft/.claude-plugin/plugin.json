@@ -1,0 +1,8 @@
+{
+  "name": "react-craft",
+  "version": "0.1.0",
+  "description": "Multi-agent Figma-to-component pipeline for React",
+  "author": { "name": "Kaelig" },
+  "license": "MIT",
+  "keywords": ["react", "figma", "components", "storybook", "a11y", "design-system"]
+}
