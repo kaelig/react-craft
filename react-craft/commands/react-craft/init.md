@@ -177,7 +177,7 @@ Check `devDependencies` and `dependencies` for `storybook` or any `@storybook/*`
 - Check for `.storybook/` directory.
 - If NOT found, warn:
 
-> Storybook not detected. The Story Author agent (v0.2) will need Storybook. Install with:
+> Storybook not detected. The Story Author agent needs Storybook. Install with:
 > ```
 > npx storybook@latest init
 > ```
@@ -289,15 +289,14 @@ scripts:
   storybook: "[STORYBOOK_CMD]"
 
 # Agent pipeline configuration
-# v0.1 agents: design-analyst, component-architect, code-writer, quality-gate
-# v0.2 agents (disabled): accessibility-auditor, story-author, visual-reviewer
+# v0.2 agents: all active except visual-reviewer (v0.3)
 agents:
   design-analyst: true
   component-architect: true
   code-writer: true
+  accessibility-auditor: true
+  story-author: true
   quality-gate: true
-  accessibility-auditor: false
-  story-author: false
   visual-reviewer: false
 
 # Output paths (relative to project root)
@@ -364,7 +363,7 @@ This project uses [react-craft](https://github.com/anthropics/react-craft) for c
 
 ### Quick Commands
 - `/react-craft:build <ComponentName>` — Run the full agent pipeline for a component
-- `/react-craft:audit` — Validate existing components against conventions (coming in v0.2)
+- `/react-craft:audit <path|glob>` — Validate existing components against design system conventions
 - `/react-craft:init` — Re-detect project conventions and update config
 
 ### Conventions
@@ -375,6 +374,10 @@ This project uses [react-craft](https://github.com/anthropics/react-craft) for c
 
 ### After Editing Components
 When you edit any `.tsx`, `.jsx`, `.css`, or `.scss` file in `[SCOPE_DIR]`, consider running `/react-craft:build` to generate or regenerate components from Figma specs.
+
+### After Editing UI Files
+After editing any .tsx, .jsx, .css, or .scss file, consider running
+`/react-craft:audit` to check for hardcoded values and DS compliance.
 <!-- react-craft:end -->
 ```
 

@@ -1,0 +1,35 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE=\"$TOOL_INPUT_FILE_PATH\"; if echo \"$FILE\" | grep -qE '\\.(tsx|jsx|css|scss)$'; then HITS=$(grep -n '#[0-9a-fA-F]\\{3,8\\}' \"$FILE\" 2>/dev/null | head -3); if [ -n \"$HITS\" ]; then echo '[react-craft] Potential hardcoded colors:'; echo \"$HITS\"; echo 'Consider running /react-craft:audit'; fi; fi"
+          }
+        ]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "FILE=\"$TOOL_INPUT_FILE_PATH\"; if echo \"$FILE\" | grep -qE '\\.(tsx|jsx)$'; then echo '[react-craft] New UI file created: '\"$FILE\"; echo 'Run /react-craft:audit to validate DS compliance.'; fi"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if echo \"$TOOL_INPUT_COMMAND\" | grep -q 'git commit'; then UI_FILES=$(git diff --cached --name-only 2>/dev/null | grep -E '\\.(tsx|jsx|css|scss)$' | head -5); if [ -n \"$UI_FILES\" ]; then echo '[react-craft] UI files in commit:'; echo \"$UI_FILES\"; echo 'Run /react-craft:audit for DS compliance.'; fi; fi"
+          }
+        ]
+      }
+    ]
+  }
+}
