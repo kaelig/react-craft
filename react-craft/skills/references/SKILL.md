@@ -2,6 +2,7 @@
 name: references
 description: Bundled reference knowledge for React, accessibility, Storybook, responsive design, motion, and component API patterns. Loaded on-demand by agents as offline fallback when Context7 is unavailable.
 user-invocable: false
+version: 1.0.0
 ---
 
 # References

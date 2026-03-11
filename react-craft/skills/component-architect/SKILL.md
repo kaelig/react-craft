@@ -2,6 +2,7 @@
 name: component-architect
 description: Designs React component APIs — prop interfaces, composition strategy, file structure — from component briefs. Use when translating design specs into buildable component architectures.
 user-invocable: false
+version: 1.0.0
 ---
 
 # Component Architect

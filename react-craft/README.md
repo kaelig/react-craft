@@ -28,7 +28,7 @@ This creates a `react-craft.config.yaml` in your project root with your React ve
 /react-craft:build https://figma.com/design/abc123?node-id=1:42
 ```
 
-Provide a Figma node-level URL. The pipeline runs six agents (with parallel execution for a11y and stories), producing a fully implemented component with types, accessibility validation, Storybook stories, and documentation.
+Provide a Figma node-level URL. The pipeline runs seven agents (with parallel execution for a11y and stories), producing a fully implemented component with types, accessibility validation, Storybook stories, visual fidelity verification, and documentation.
 
 ### 4. Audit existing components
 
@@ -36,7 +36,17 @@ Provide a Figma node-level URL. The pipeline runs six agents (with parallel exec
 /react-craft:audit src/components/Button
 ```
 
-Run the enforcement skills (Guardian, Token Validator, Implementation Checker, Deviation Tracker) against existing components to check design system compliance.
+Run the enforcement skills (Guardian, Token Validator, Implementation Checker, Deviation Tracker) against existing components to check design system compliance. Add `--custom` to also run custom pipeline skills.
+
+### 5. Evaluate pipeline quality
+
+```
+/react-craft:eval
+/react-craft:eval --fixture=material-button
+/react-craft:eval --fixture=material-button --compare=<previous-run-id>
+```
+
+Run the eval suite against component fixtures to measure pipeline output quality. Supports deterministic graders (TypeScript, lint, axe-core, stories) and LLM-as-judge graders (visual fidelity, API quality, code readability).
 
 #### Build Options
 
@@ -54,10 +64,10 @@ Run the enforcement skills (Guardian, Token Validator, Implementation Checker, D
 
 react-craft uses a pipeline of specialized agents. Each agent reads the upstream output, does its job, and writes a structured handoff document for the next.
 
-### v0.2 Pipeline (6 agents)
+### v0.3 Pipeline (7 agents)
 
 ```
-Design Analyst → Component Architect → Code Writer → [Accessibility Auditor ∥ Story Author] → Quality Gate
+Design Analyst → Component Architect → Code Writer → [Accessibility Auditor ∥ Story Author] → Visual Reviewer → Quality Gate
 ```
 
 1. **Design Analyst** — Extracts and validates design specs from Figma, produces the component brief
@@ -65,9 +75,30 @@ Design Analyst → Component Architect → Code Writer → [Accessibility Audito
 3. **Code Writer** — Implements components following brief, architecture, and project conventions
 4. **Accessibility Auditor** — Reviews from disability perspective, runs axe-core and keyboard tests *(parallel with 5)*
 5. **Story Author** — Creates Storybook stories covering every state and edge case *(parallel with 4)*
-6. **Quality Gate** — Runs TypeScript, linting, formatting, and Storybook tests; final mechanical validation
+6. **Visual Reviewer** — Screenshots Figma and Storybook, compares across 9 dimensions, applies iterative fixes
+7. **Quality Gate** — Runs TypeScript, linting, formatting, and Storybook tests; final mechanical validation
 
-Steps 4 and 5 run in parallel after Code Writer completes. If the Accessibility Auditor finds P1 (blocker) issues, Code Writer remediates and stories are regenerated before the Quality Gate runs.
+Steps 4 and 5 run in parallel after Code Writer completes. If the Accessibility Auditor finds P1 (blocker) issues, Code Writer remediates and stories are regenerated. The Visual Reviewer then compares the rendered output against the Figma design before the Quality Gate runs.
+
+### Visual Review
+
+The Visual Reviewer compares rendered Storybook stories against Figma designs across 9 dimensions:
+
+| Dimension | What It Checks |
+|-----------|---------------|
+| Layout | Element positioning, flex/grid alignment, overall structure |
+| Typography | Font family, size, weight, line-height, letter-spacing |
+| Colors | Background, text, border colors, opacity |
+| Spacing | Padding, margin, gaps between elements |
+| Shadows | Box-shadow, drop-shadow presence and values |
+| Borders | Border width, style, color |
+| Border-radius | Corner rounding values |
+| Icons | Presence, size, positioning, color |
+| States | Hover, focus, active, disabled visual treatments |
+
+Discrepancies are classified as CRITICAL, MODERATE, or MINOR. The agent applies up to 5 iterative fixes for critical/moderate issues, prioritizing structure over polish. It caches the Figma reference screenshot and uses a diminishing-returns threshold to avoid wasting tokens on minor tweaks.
+
+Requires Playwright MCP for screenshots. If unavailable, the step is skipped gracefully.
 
 ### Accessibility Testing
 
@@ -97,7 +128,7 @@ react-craft works standalone and integrates with other Claude Code plugins for e
 
 | Setup | What You Get |
 |-------|-------------|
-| **react-craft alone** | Full Figma-to-component pipeline with 6 agents |
+| **react-craft alone** | Full Figma-to-component pipeline with 7 agents |
 | **react-craft + CE** | Enhanced with Compound Engineering's orchestration and agent coordination |
 | **react-craft + BMAD** | Enhanced with BMAD's workflow management and project methodology |
 | **react-craft + CE + BMAD** | Full stack: methodology, orchestration, and component pipeline |
@@ -112,6 +143,7 @@ When `--best-effort` is set, the pipeline runs autonomously without stopping for
 | Brief has pending items | Mark as assumed with reasoning |
 | Git branch already exists | Reuse existing branch |
 | Artifact hash mismatch on resume | Continue with warning |
+| Visual Reviewer CRITICAL findings | Log as unresolved and continue |
 | Quality Gate fails | Attempt remediation (max 3 tries) |
 | Concurrent pipeline detected | Warn and stop (never override — data safety) |
 
@@ -142,12 +174,30 @@ react-craft uses a dual strategy for enforcement:
 
 Together, they catch issues at two levels: hooks catch what grep can find; CLAUDE.md instructions catch what requires understanding.
 
-## Known Limitations (v0.2)
+## Custom Pipeline Skills
 
-- No visual comparison against Figma (v0.3 — Visual Reviewer agent)
-- No `/react-craft:eval` command for fixture-based evaluation (v0.3)
-- No custom pipeline step extensibility (v0.3)
+You can extend the pipeline with custom validation skills. Any SKILL.md that follows the custom skill contract can be plugged in via config:
+
+```yaml
+pipeline:
+  custom_skills:
+    - path: ".claude/skills/i18n-checker/SKILL.md"
+      config:
+        default_locale: "en-US"
+        frameworks: ["react-intl", "i18next"]
+    - path: ".claude/skills/content-strategy/SKILL.md"
+      readonly: true
+      config:
+        tone_guide: "docs/content/tone-guide.md"
+```
+
+Custom skills must: accept file paths as input, output findings in `[SEVERITY] file:line — category: description` format, and be self-contained. See `examples/custom-skills/i18n-checker/` for a working example and `skills/references/custom-skill-contract.md` for the full contract.
+
+## Known Limitations (v0.3)
+
 - Single component per pipeline run (no batch mode)
+- Eval fixtures limited to Material Design, Apple HIG, and adversarial test cases
+- No Figma-to-code drift detection (documented as future extension point)
 
 ## Roadmap
 
@@ -157,7 +207,7 @@ Together, they catch issues at two levels: hooks catch what grep can find; CLAUD
 - Design Analyst, Component Architect, Code Writer, Quality Gate agents
 - Component brief and architecture templates
 
-### v0.2 (current)
+### v0.2
 - Accessibility Auditor and Story Author agents (parallel execution)
 - `/react-craft:audit` command for design system compliance
 - Enforcement skills: Guardian, Token Validator, Implementation Checker, Deviation Tracker
@@ -167,10 +217,18 @@ Together, they catch issues at two levels: hooks catch what grep can find; CLAUD
 - Shell hooks for hardcoded value detection and commit-time audits
 - Reference docs for a11y patterns, Storybook best practices, and design tokens
 
-### v0.3
-- Visual Reviewer agent (pixel-level Figma comparison)
-- `/react-craft:eval` command with Figma fixture-based evaluation
-- Custom pipeline step extensibility
+### v0.3 (current)
+- Visual Reviewer agent (9-dimension Figma comparison with iterative fixes)
+- `/react-craft:eval` command with fixture-based evaluation and benchmark reports
+- Custom pipeline skill slots (plug in i18n, content strategy, etc.)
+- Agent prompt versioning for eval reproducibility
+- A/B testing for comparing skill versions
+
+### v0.4
+- Documentation site (GitHub Pages)
+- GitHub Actions CI for eval-on-PR
+- Demo video
+- Figma-to-code drift detection
 
 ## License
 

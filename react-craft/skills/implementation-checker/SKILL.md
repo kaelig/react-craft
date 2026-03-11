@@ -2,6 +2,7 @@
 name: implementation-checker
 description: Checks UI components for missing accessibility attributes, keyboard navigation, focus management, loading/error/empty states, and other implementation concerns that Figma designs typically omit. Static pattern matching only — complements (does not duplicate) eslint-plugin-jsx-a11y.
 user-invocable: false
+version: 1.0.0
 allowed-tools: Read, Glob, Grep
 ---
 

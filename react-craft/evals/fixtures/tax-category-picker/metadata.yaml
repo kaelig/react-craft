@@ -1,0 +1,33 @@
+name: tax-category-picker
+design_system: acme-ds
+complexity: complex
+expected_agents:
+  - design-analyst
+  - component-architect
+  - code-writer
+  - accessibility-auditor
+  - story-author
+  - quality-gate
+expected_duration_seconds: 90
+tags:
+  - dropdown
+  - search
+  - grouped-list
+  - interactive
+  - data-fetching
+  - acme
+
+# This fixture references the existing TaxCategoryPicker eval fixture.
+# Source component: examples/eval-fixtures/TaxCategoryPicker.tsx
+# Expected findings: examples/eval-fixtures/EXPECTED_FINDINGS.md
+#
+# The TaxCategoryPicker is a complex component with:
+# - Async data fetching (useEffect + fetch)
+# - Grouped, searchable dropdown
+# - Multiple hardcoded design tokens
+# - Missing keyboard navigation and ARIA attributes
+# - Missing loading/error/empty states
+# - One intentional deviation with @ds-deviation comment
+source_files:
+  component: "../../examples/eval-fixtures/TaxCategoryPicker.tsx"
+  expected_findings: "../../examples/eval-fixtures/EXPECTED_FINDINGS.md"

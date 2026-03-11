@@ -1,0 +1,190 @@
+anova_version: "1.0"
+export_date: "2026-03-11"
+source:
+  design_system: "Material Design 3"
+  figma_file: "https://www.figma.com/file/abc123/Material-Design-3"
+  node_id: "1:5678"
+
+component:
+  name: "TextField"
+  description: "Material Design 3 text field. Supports filled and outlined variants with label, helper text, error state, leading/trailing icons, and character counter."
+  category: "input"
+
+  variants:
+    - name: "filled"
+      description: "Text field with a filled container background and bottom border. The label animates from placeholder position to above the input on focus or when populated."
+      properties:
+        variant:
+          type: "enum"
+          default: "filled"
+          options: ["filled", "outlined"]
+    - name: "outlined"
+      description: "Text field with a visible border on all sides. The label animates into a notch in the top border on focus or when populated."
+      properties:
+        variant:
+          type: "enum"
+          default: "filled"
+          options: ["filled", "outlined"]
+
+  states:
+    - name: "empty"
+      description: "No value entered. Label displayed in placeholder position inside the input area."
+      visual_changes:
+        - property: "label-position"
+          value: "center of input area"
+    - name: "focused"
+      description: "Input has keyboard focus. Label animates to top position. Active indicator appears."
+      visual_changes:
+        - property: "label-position"
+          value: "top of input area, scaled down"
+        - property: "border-color"
+          value: "var(--md-sys-color-primary)"
+        - property: "border-width"
+          value: "2px (filled: bottom only, outlined: all sides)"
+    - name: "populated"
+      description: "Input has a value. Label stays in top position."
+      visual_changes:
+        - property: "label-position"
+          value: "top of input area, scaled down"
+    - name: "error"
+      description: "Input has a validation error. Error color applied to label, border, and helper text. Error icon shown in trailing position."
+      visual_changes:
+        - property: "border-color"
+          value: "var(--md-sys-color-error)"
+        - property: "label-color"
+          value: "var(--md-sys-color-error)"
+        - property: "helper-text-color"
+          value: "var(--md-sys-color-error)"
+    - name: "disabled"
+      description: "Input is non-interactive. Reduced opacity on all elements."
+      visual_changes:
+        - property: "opacity"
+          value: "0.38 content, 0.04 container (filled), 0.12 border (outlined)"
+        - property: "cursor"
+          value: "not-allowed"
+    - name: "hovered"
+      description: "Mouse cursor is over the input area."
+      visual_changes:
+        - property: "border-color"
+          value: "var(--md-sys-color-on-surface)"
+        - property: "label-color"
+          value: "var(--md-sys-color-on-surface)"
+
+  anatomy:
+    - name: "container"
+      element: "div"
+      required: true
+      children:
+        - name: "input-wrapper"
+          element: "div"
+          required: true
+          children:
+            - name: "label"
+              element: "label"
+              required: true
+            - name: "input"
+              element: "input"
+              required: true
+            - name: "leading-icon"
+              element: "span"
+              required: false
+            - name: "trailing-icon"
+              element: "span"
+              required: false
+        - name: "active-indicator"
+          element: "span"
+          required: true
+        - name: "supporting-text"
+          element: "div"
+          required: false
+          children:
+            - name: "helper-text"
+              element: "span"
+              required: false
+            - name: "character-counter"
+              element: "span"
+              required: false
+
+  tokens:
+    colors:
+      - name: "--md-sys-color-primary"
+        value: "#6750A4"
+        usage: "Focused state border and label color"
+      - name: "--md-sys-color-on-surface"
+        value: "#1C1B1F"
+        usage: "Input text color, hovered border color"
+      - name: "--md-sys-color-on-surface-variant"
+        value: "#49454F"
+        usage: "Resting label color, helper text color, placeholder color"
+      - name: "--md-sys-color-error"
+        value: "#B3261E"
+        usage: "Error state border, label, and helper text color"
+      - name: "--md-sys-color-on-error"
+        value: "#FFFFFF"
+        usage: "Error icon foreground if using filled error icon"
+      - name: "--md-sys-color-surface-variant"
+        value: "#E7E0EC"
+        usage: "Filled variant container background"
+      - name: "--md-sys-color-outline"
+        value: "#79747E"
+        usage: "Outlined variant resting border color"
+      - name: "--md-sys-color-outline-variant"
+        value: "#CAC4D0"
+        usage: "Outlined variant disabled border color"
+    spacing:
+      - name: "--md-sys-spacing-md"
+        value: "16px"
+        usage: "Horizontal padding inside the input area"
+      - name: "--md-sys-spacing-xs"
+        value: "4px"
+        usage: "Gap between helper text and input container"
+      - name: "--md-sys-spacing-sm"
+        value: "8px"
+        usage: "Vertical padding, gap between icon and input"
+    typography:
+      - name: "--md-sys-typescale-body-large"
+        value: "font-family: Roboto; font-size: 16px; font-weight: 400; line-height: 24px; letter-spacing: 0.5px"
+        usage: "Input text and populated label style"
+      - name: "--md-sys-typescale-body-small"
+        value: "font-family: Roboto; font-size: 12px; font-weight: 400; line-height: 16px; letter-spacing: 0.4px"
+        usage: "Floating label (when focused/populated) and helper text"
+      - name: "--md-sys-typescale-label-large"
+        value: "font-family: Roboto; font-size: 14px; font-weight: 500; line-height: 20px; letter-spacing: 0.1px"
+        usage: "Character counter text"
+    elevation:
+      - name: "--md-sys-elevation-level0"
+        value: "none"
+        usage: "Text fields have no elevation"
+
+  interactions:
+    - trigger: "click"
+      action: "Focus the input element. If clicking on the label area, move cursor to input."
+      animation: "Label animates from center to top position, 150ms ease-out"
+    - trigger: "focus"
+      action: "Show active indicator (2px primary-colored border). Animate label to floating position."
+      animation: "Label scale and translate, 150ms ease-out. Border color transition 150ms."
+    - trigger: "hover"
+      action: "Change border color to on-surface. Change label color to on-surface."
+      animation: "Color transition 150ms"
+    - trigger: "keyboard"
+      action: "Tab to focus/blur. Type to enter text. Standard input keyboard behavior."
+      animation: null
+
+  accessibility:
+    role: "textbox"
+    keyboard:
+      - key: "Tab"
+        action: "Focus or blur the text field"
+      - key: "Any printable key"
+        action: "Enters text into the field"
+      - key: "Backspace/Delete"
+        action: "Removes text from the field"
+      - key: "Ctrl+A"
+        action: "Select all text"
+    announcements:
+      - event: "focus"
+        message: "Label text, textbox role, current value if any, required state, error message if in error state"
+      - event: "error"
+        message: "Error: [error text], announced via aria-describedby linked to error helper text"
+      - event: "character-limit"
+        message: "[current count] of [max] characters, announced via aria-live polite region"

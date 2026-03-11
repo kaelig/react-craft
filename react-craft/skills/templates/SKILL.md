@@ -2,6 +2,7 @@
 name: templates
 description: Templates for component briefs and architecture docs. Use when creating new component specs or architecture documents in the react-craft pipeline.
 user-invocable: false
+version: 1.0.0
 ---
 
 # Templates

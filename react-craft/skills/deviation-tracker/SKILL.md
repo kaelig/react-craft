@@ -2,6 +2,7 @@
 name: deviation-tracker
 description: Classifies design system findings as accidental, intentional, or needs-review. Generates structured YAML deviation reports for the design system team. Parses @ds-deviation inline comments for justifications.
 user-invocable: false
+version: 1.0.0
 allowed-tools: Read, Write, Glob, Grep
 ---
 

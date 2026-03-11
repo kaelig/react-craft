@@ -1,6 +1,6 @@
 {
   "name": "react-craft",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Multi-agent Figma-to-component pipeline for React",
   "author": { "name": "Kaelig" },
   "license": "MIT",

@@ -2,6 +2,7 @@
 name: quality-gate
 description: Runs TypeScript compilation, linting, and formatting checks on generated components. Final mechanical validation before a component is ready for review. Use as the last step in the react-craft build pipeline.
 user-invocable: false
+version: 1.0.0
 ---
 
 # Quality Gate

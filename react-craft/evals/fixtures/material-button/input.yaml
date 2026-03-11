@@ -1,0 +1,174 @@
+anova_version: "1.0"
+export_date: "2026-03-11"
+source:
+  design_system: "Material Design 3"
+  figma_file: "https://www.figma.com/file/abc123/Material-Design-3"
+  node_id: "1:2345"
+
+component:
+  name: "Button"
+  description: "Material Design 3 common button. Supports filled, outlined, text, elevated, and tonal variants with optional icon placement."
+  category: "button"
+
+  variants:
+    - name: "filled"
+      description: "High-emphasis button with solid background color. Used for primary actions."
+      properties:
+        variant:
+          type: "enum"
+          default: "filled"
+          options: ["filled", "outlined", "text", "elevated", "tonal"]
+    - name: "outlined"
+      description: "Medium-emphasis button with a border and no fill. Used for secondary actions."
+      properties:
+        variant:
+          type: "enum"
+          default: "filled"
+          options: ["filled", "outlined", "text", "elevated", "tonal"]
+    - name: "text"
+      description: "Low-emphasis button with no border or fill. Used for tertiary actions."
+      properties:
+        variant:
+          type: "enum"
+          default: "filled"
+          options: ["filled", "outlined", "text", "elevated", "tonal"]
+    - name: "elevated"
+      description: "Filled button with elevation shadow. Used when a filled button needs more visual separation from the surface."
+      properties:
+        variant:
+          type: "enum"
+          default: "filled"
+          options: ["filled", "outlined", "text", "elevated", "tonal"]
+    - name: "tonal"
+      description: "Filled button with a softer background color. Used for medium-emphasis actions that need more visual weight than text or outlined."
+      properties:
+        variant:
+          type: "enum"
+          default: "filled"
+          options: ["filled", "outlined", "text", "elevated", "tonal"]
+
+  states:
+    - name: "default"
+      description: "Resting state of the button."
+      visual_changes: []
+    - name: "hovered"
+      description: "Mouse cursor is over the button."
+      visual_changes:
+        - property: "opacity"
+          value: "0.08 state layer"
+        - property: "elevation"
+          value: "level 1 (filled/tonal/elevated only)"
+    - name: "focused"
+      description: "Button has keyboard focus."
+      visual_changes:
+        - property: "opacity"
+          value: "0.12 state layer"
+        - property: "outline"
+          value: "3px solid var(--md-sys-color-secondary)"
+    - name: "pressed"
+      description: "Button is being activated."
+      visual_changes:
+        - property: "opacity"
+          value: "0.12 state layer"
+    - name: "disabled"
+      description: "Button is non-interactive."
+      visual_changes:
+        - property: "opacity"
+          value: "0.38 content, 0.12 container"
+        - property: "cursor"
+          value: "not-allowed"
+
+  anatomy:
+    - name: "container"
+      element: "button"
+      required: true
+      children:
+        - name: "state-layer"
+          element: "span"
+          required: false
+        - name: "icon"
+          element: "span"
+          required: false
+        - name: "label"
+          element: "span"
+          required: true
+
+  tokens:
+    colors:
+      - name: "--md-sys-color-primary"
+        value: "#6750A4"
+        usage: "Filled button background, text button label color"
+      - name: "--md-sys-color-on-primary"
+        value: "#FFFFFF"
+        usage: "Filled button label color"
+      - name: "--md-sys-color-outline"
+        value: "#79747E"
+        usage: "Outlined button border color"
+      - name: "--md-sys-color-on-surface"
+        value: "#1C1B1F"
+        usage: "Text/outlined button label color"
+      - name: "--md-sys-color-secondary-container"
+        value: "#E8DEF8"
+        usage: "Tonal button background"
+      - name: "--md-sys-color-on-secondary-container"
+        value: "#1D192B"
+        usage: "Tonal button label color"
+      - name: "--md-sys-color-surface"
+        value: "#FFFBFE"
+        usage: "Elevated button background"
+      - name: "--md-sys-color-on-surface-variant"
+        value: "#49454F"
+        usage: "Disabled button label color at 0.38 opacity"
+    spacing:
+      - name: "--md-sys-spacing-md"
+        value: "24px"
+        usage: "Horizontal padding for buttons"
+      - name: "--md-sys-spacing-sm"
+        value: "16px"
+        usage: "Horizontal padding for icon-only or compact buttons"
+      - name: "--md-sys-spacing-xs"
+        value: "8px"
+        usage: "Gap between icon and label"
+    typography:
+      - name: "--md-sys-typescale-label-large"
+        value: "font-family: Roboto; font-size: 14px; font-weight: 500; line-height: 20px; letter-spacing: 0.1px"
+        usage: "Button label text style"
+    elevation:
+      - name: "--md-sys-elevation-level0"
+        value: "none"
+        usage: "Text, outlined button elevation"
+      - name: "--md-sys-elevation-level1"
+        value: "0px 1px 2px rgba(0,0,0,0.3), 0px 1px 3px 1px rgba(0,0,0,0.15)"
+        usage: "Elevated button resting elevation"
+      - name: "--md-sys-elevation-level2"
+        value: "0px 1px 2px rgba(0,0,0,0.3), 0px 2px 6px 2px rgba(0,0,0,0.15)"
+        usage: "Elevated button hovered elevation"
+
+  interactions:
+    - trigger: "click"
+      action: "Activate the button's primary action. Show ripple effect from click origin."
+      animation: "Ripple expands from click point, 300ms ease-out"
+    - trigger: "hover"
+      action: "Show state layer overlay and increase elevation (filled/tonal/elevated variants)"
+      animation: "State layer fades in 150ms, elevation transition 150ms"
+    - trigger: "focus"
+      action: "Show focus ring and state layer"
+      animation: "Focus ring appears immediately, state layer fades in 150ms"
+    - trigger: "keyboard"
+      action: "Enter or Space activates the button"
+      animation: "Same ripple as click, centered on the button"
+
+  accessibility:
+    role: "button"
+    keyboard:
+      - key: "Enter"
+        action: "Activates the button"
+      - key: "Space"
+        action: "Activates the button"
+      - key: "Tab"
+        action: "Moves focus to the next focusable element"
+    announcements:
+      - event: "focus"
+        message: "Button label text, button role, disabled state if applicable"
+      - event: "activation"
+        message: "No additional announcement (action feedback is context-dependent)"

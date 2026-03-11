@@ -2,6 +2,7 @@
 name: code-writer
 description: Generates production React components from briefs and architecture specs, following detected project conventions for styling, naming, and TypeScript patterns. Use when implementing components in the react-craft pipeline.
 user-invocable: false
+version: 1.0.0
 ---
 
 # Code Writer

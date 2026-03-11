@@ -8,7 +8,7 @@ allowed-tools: Read, Write, Edit, Bash(npx *), Bash(npm *), Glob, Grep, Skill
 
 # Build Pipeline
 
-You are the react-craft build orchestrator. You run a 6-agent pipeline that transforms a Figma design into a production React component with accessibility validation and Storybook stories. Follow each step in order. Do not skip steps.
+You are the react-craft build orchestrator. You run a 7-agent pipeline that transforms a Figma design into a production React component with accessibility validation, Storybook stories, and visual fidelity verification. Follow each step in order. Do not skip steps.
 
 Parse the user's arguments:
 - **Required:** `<figma-link>` — a Figma URL (or `--resume <ComponentName>`)
@@ -120,7 +120,7 @@ best_effort: <true|false>
 status: in-progress
 baseline_tsc_errors: <BASELINE_TSC_ERRORS>
 dry_run: <true|false>
-iteration_budget: 10
+iteration_budget: 12
 iterations_used: 0
 steps:
   design-analyst: { status: pending }
@@ -128,6 +128,7 @@ steps:
   code-writer: { status: pending }
   accessibility-auditor: { status: pending }
   story-author: { status: pending }
+  visual-reviewer: { status: pending }
   quality-gate: { status: pending }
 artifacts: {}
 ```
@@ -136,15 +137,15 @@ artifacts: {}
 
 ## Step 3: Run Pipeline
 
-Run agents in sequence (3a-3c), then in parallel (3d-3e), then final gate (3f). Each agent reads upstream artifacts and writes its own output. After each agent completes, update `pipeline-state.yaml`.
+Run agents in sequence (3a-3c), then in parallel (3d-3e), then visual review (3f), then final gate (3g). Each agent reads upstream artifacts and writes its own output. After each agent completes, update `pipeline-state.yaml`.
 
 **Progress reporting:** Before each agent invocation, print a progress line:
 ```
-[react-craft] (N/6) <AgentName>: <brief description of what it's doing>...
+[react-craft] (N/7) <AgentName>: <brief description of what it's doing>...
 ```
-For example: `[react-craft] (3/6) Code Writer: generating Button.tsx...`
+For example: `[react-craft] (3/7) Code Writer: generating Button.tsx...`
 
-**Global iteration budget:** Track total agent invocations across the entire pipeline. If `iterations_used` reaches 10, halt with partial status.
+**Global iteration budget:** Track total agent invocations across the entire pipeline. If `iterations_used` reaches 12, halt with partial status.
 
 **Dry-run mode:** If `DRY_RUN` is true, stop after Step 3b (Component Architect). Print:
 ```
@@ -205,7 +206,7 @@ After completion:
 
 ### 3d. Accessibility Auditor (parallel with 3e)
 
-Print: `[react-craft] (4/6) Accessibility Auditor: auditing <ComponentName> for WCAG compliance...`
+Print: `[react-craft] (4/7) Accessibility Auditor: auditing <ComponentName> for WCAG compliance...`
 
 Invoke the `accessibility-auditor` skill with:
 - Generated component file paths
@@ -231,7 +232,7 @@ After completion:
 
 ### 3e. Story Author (parallel with 3d)
 
-Print: `[react-craft] (5/6) Story Author: generating stories for <ComponentName>...`
+Print: `[react-craft] (5/7) Story Author: generating stories for <ComponentName>...`
 
 Invoke the `story-author` skill with:
 - Generated component file paths
@@ -250,9 +251,36 @@ After completion:
 
 **Race condition note:** If Accessibility Auditor (3d) finds P1 issues triggering Code Writer remediation, Story Author output is discarded and stories are re-generated after remediation completes. See Step 3d for the full remediation flow.
 
-### 3f. Quality Gate
+### 3f. Visual Reviewer
 
-Print: `[react-craft] (6/6) Quality Gate: running checks on <ComponentName>...`
+Print: `[react-craft] (6/7) Visual Reviewer: comparing <ComponentName> against Figma...`
+
+Invoke the `visual-reviewer` skill with:
+- Figma link (from pipeline state: `FIGMA_LINK`)
+- Storybook story URLs (from Story Author output in `pipeline-state.yaml`)
+- Path to `brief.md`
+- `react-craft.config.yaml` path
+- `BEST_EFFORT` flag
+
+**Skip condition:** If Playwright MCP is not available OR Figma screenshot cannot be obtained, skip with warning:
+
+> [react-craft] Visual Reviewer skipped — Playwright MCP or Figma screenshot unavailable.
+
+Update `pipeline-state.yaml` with `visual-reviewer: { status: skipped, reason: "..." }` and proceed to Quality Gate.
+
+**Expected output:** `visual-report.md` in the output directory with dimension results (PASS/MINOR/MODERATE/CRITICAL per dimension), iteration log, and overall status.
+
+After completion:
+1. Compute SHA-256 of `visual-report.md`, store in `pipeline-state.yaml` under `artifacts.visual-report`
+2. If Visual Reviewer modified component files (CSS fixes), recompute SHA-256 hashes for all affected component artifacts and update `pipeline-state.yaml`
+3. Update step status to `completed` with timestamp
+4. Increment `iterations_used`
+
+**Gate:** If any CRITICAL visual findings remain unresolved and `--best-effort` is NOT set, halt pipeline and present findings. In `--best-effort` mode: log as `[UNRESOLVED_VISUAL]` and continue.
+
+### 3g. Quality Gate
+
+Print: `[react-craft] (7/7) Quality Gate: running checks on <ComponentName>...`
 
 Invoke the `quality-gate` skill with:
 - Generated component file paths
@@ -282,7 +310,7 @@ If Quality Gate reports **FAIL**:
 ### 4a. Check remediation budget
 
 - Max 3 remediation attempts
-- Check global iteration budget (max 10 total)
+- Check global iteration budget (max 12 total)
 - If either exceeded, go to Step 4c (terminal state)
 
 ### 4b. Bail on identical failures
@@ -296,7 +324,7 @@ Pass to Code Writer:
 - The specific files that need changes
 - `BEST_EFFORT` flag
 
-After Code Writer completes, re-run Quality Gate (Step 3f). Update `iterations_used`.
+After Code Writer completes, re-run Quality Gate (Step 3g). Update `iterations_used`.
 
 ### 4d. Terminal state (remediation exhausted)
 
@@ -347,6 +375,7 @@ Documentation:
   docs/react-craft/components/<ComponentName>/brief.md
   docs/react-craft/components/<ComponentName>/architecture.md
   docs/react-craft/components/<ComponentName>/a11y-report.md
+  docs/react-craft/components/<ComponentName>/visual-report.md
   docs/react-craft/components/<ComponentName>/review.md
 
 Accessibility: <PASS|FINDINGS>
@@ -356,6 +385,12 @@ Accessibility: <PASS|FINDINGS>
 
 Stories: <count> stories generated
   Storybook test: <PASS|FAIL|SKIPPED>
+
+Visual Review: <PASS|PASS with minor notes|SKIPPED>
+  Critical: <count>
+  Moderate: <count> (<fixed count> fixed)
+  Minor: <count> remaining
+  Iterations: <count>
 
 Quality Gate: PASS
   TypeScript: ✓
@@ -388,6 +423,52 @@ If any enforcement skill reports violations at `error` severity, the pipeline st
 
 If `enforcement.enabled` is not set or is `false`, skip this step entirely.
 
+### 5c2. Custom Pipeline Skills
+
+If `pipeline.custom_skills` exists in `react-craft.config.yaml` and contains entries, run custom skills after enforcement (or after Quality Gate if enforcement is disabled).
+
+For each entry in `pipeline.custom_skills`:
+
+1. **Validate:** Check that `SKILL.md` exists at the specified `path`. If not found, log `"[WARN] Custom skill skipped: SKILL.md not found at [path]"` and continue to next skill.
+2. **Read:** Read the skill's SKILL.md frontmatter to get `name` and `description`.
+3. **Invoke:** Invoke the skill with:
+   - Generated component file paths (from Code Writer output)
+   - Skill-specific `config` block from the pipeline entry
+   - `react-craft.config.yaml` path for project context
+4. **Collect output:** Parse findings in `[SEVERITY] file:line — category: description` format.
+
+**Execution order:**
+- Custom skills run **sequentially** by default (they may modify files).
+- If a skill has `readonly: true` in its config, it can run **in parallel** with other `readonly: true` skills. Batch all consecutive readonly skills and invoke them simultaneously.
+
+**Error handling:**
+- If a skill crashes (tool error, timeout), log `"[WARN] Custom skill [name] crashed: [error]. Skipping."` and continue to next skill.
+- If a skill returns output that does not match the expected findings format, log `"[WARN] Custom skill [name] returned malformed output. Skipping findings."` and continue.
+- Custom skill failures never block pipeline completion.
+
+**Results:**
+- Append all custom skill findings to `review.md` under a `## Custom Skills` section.
+- Group findings by skill name:
+
+```markdown
+## Custom Skills
+
+### i18n-checker
+[WARNING] src/components/Button.tsx:23 — hardcoded-string: "Submit" should use i18n
+[INFO] src/components/Button.tsx:45 — hardcoded-string: Low-confidence detection in dynamic context
+
+### content-strategy
+[WARNING] src/components/Card.tsx:12 — tone: Heading uses informal tone
+```
+
+- If custom skills report `[ERROR]` findings, set pipeline status to `partial` (same behavior as enforcement errors).
+- `[WARNING]` and `[INFO]` findings are reported but do not block completion.
+
+Print progress for each custom skill:
+```
+[react-craft] Custom skill: <skill-name> — <description>...
+```
+
 ### 5d. Artifact integrity check (used by resume)
 
 For each artifact in `pipeline-state.yaml`:
@@ -409,6 +490,7 @@ When `--best-effort` is set, every human gate has an autonomous default:
 | Git branch already exists | Reuse existing branch |
 | Artifact hash mismatch on resume | Continue with warning |
 | A11y Auditor P1 findings | Attempt Code Writer remediation |
+| Visual Reviewer CRITICAL findings | Log as `[UNRESOLVED_VISUAL]` and continue |
 | Quality Gate FAIL (first attempt) | Attempt remediation |
 | Enforcement violations (error) | Report but mark as partial |
 | Concurrent pipeline detected | Warn and stop (never override — data safety) |
@@ -421,6 +503,7 @@ When `--best-effort` is set, every human gate has an autonomous default:
 |---------|-------|-------------|
 | Per-agent remediation | 3 | Code Writer re-invocations for same Quality Gate failure |
 | A11y remediation | 2 | Code Writer re-invocations for P1 accessibility findings |
-| Global iterations | 10 | Total agent skill invocations across the entire pipeline |
+| Visual review iterations | 5 | Internal to Visual Reviewer (counts as 1 pipeline iteration) |
+| Global iterations | 12 | Total agent skill invocations across the entire pipeline |
 
 When either per-agent limit is hit or the global budget is exhausted, the pipeline enters terminal state (Step 4d).

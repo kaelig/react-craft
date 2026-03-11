@@ -1,7 +1,7 @@
 ---
 name: react-craft:audit
 description: Run enforcement skills against existing or generated components to validate design system compliance
-argument-hint: "<path|glob> [--fix] [--severity=warning]"
+argument-hint: "<path|glob> [--fix] [--severity=warning] [--custom]"
 disable-model-invocation: true
 allowed-tools: Read, Glob, Grep, Write, Edit, Bash(npx *)
 ---
@@ -14,8 +14,9 @@ Parse the user's arguments:
 - **Required:** `<path|glob>` — file path, directory, or glob pattern to audit
 - **Optional:** `--fix` — auto-fix findings where confidence is high enough
 - **Optional:** `--severity=warning|error` — minimum severity threshold for the report (default: all severities)
+- **Optional:** `--custom` — also run custom skills from `pipeline.custom_skills` config
 
-Store parsed flags in working memory: `TARGET`, `AUTO_FIX` (boolean), `SEVERITY_THRESHOLD` (string).
+Store parsed flags in working memory: `TARGET`, `AUTO_FIX` (boolean), `SEVERITY_THRESHOLD` (string), `RUN_CUSTOM` (boolean).
 
 ---
 
@@ -110,6 +111,25 @@ The Deviation Tracker classifies all findings and generates the YAML report.
 On error:
 - Log: `"[WARN] Deviation Tracker skipped: [reason]"`
 - Present findings without classification
+
+### 2e. Custom Skills (if --custom)
+
+If `RUN_CUSTOM` is true, read `pipeline.custom_skills` from `react-craft.config.yaml`.
+
+For each custom skill entry:
+
+1. Validate that `SKILL.md` exists at the specified `path`. If not found, log `"[WARN] Custom skill skipped: SKILL.md not found at [path]"` and continue.
+2. Read the skill's SKILL.md to get name and description.
+3. Invoke the skill with the target files in scope and the skill-specific `config` block.
+4. Collect findings in `[SEVERITY] file:line — category: description` format.
+
+Custom skills run sequentially by default. If a skill has `readonly: true`, it can run in parallel with other readonly skills.
+
+If a skill crashes or returns malformed output, log a warning and continue to the next skill. Custom skill failures never abort the audit.
+
+Append custom skill findings to the consolidated report under a `### Custom Skills` section in Step 5.
+
+If `RUN_CUSTOM` is false or `pipeline.custom_skills` is not configured, skip this step.
 
 ---
 

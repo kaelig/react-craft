@@ -2,6 +2,7 @@
 name: accessibility-auditor
 description: Reviews generated components for WCAG 2.2 compliance using automated testing (axe-core, keyboard, screen reader) and produces actionable findings. Use after code generation in the react-craft pipeline.
 user-invocable: false
+version: 1.0.0
 ---
 
 # Accessibility Auditor

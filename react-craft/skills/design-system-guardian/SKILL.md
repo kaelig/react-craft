@@ -2,6 +2,7 @@
 name: design-system-guardian
 description: Validates UI component usage against a design system manifest from Storybook MCP. Detects custom components where design system equivalents exist, incorrect prop usage, and composition opportunities.
 user-invocable: false
+version: 1.0.0
 allowed-tools: Read, Glob, Grep
 metadata:
   mcp-server: storybook

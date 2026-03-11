@@ -238,6 +238,30 @@ Record as `BANNED_DEPS` list.
 
 If `USE_DEFAULTS` is true, set `BANNED_DEPS` to `[]`.
 
+### 2h. Custom Pipeline Skills (interactive only)
+
+If `USE_DEFAULTS` is false, ask:
+
+> Do you have any custom validation skills to add to the pipeline? (e.g., i18n checker, content strategy)
+>
+> A custom skill is a `SKILL.md` file that checks component code and reports findings.
+> See `skills/references/custom-skill-contract.md` for the contract, or
+> `examples/custom-skills/i18n-checker/SKILL.md` for a working example.
+
+If yes:
+
+1. Ask for the path to the SKILL.md file (relative to project root)
+2. Ask for any config values the skill needs (key-value pairs)
+3. Ask if the skill is read-only (only reads files, never writes them)
+4. Repeat for additional skills until the user says they're done
+
+Record as `CUSTOM_SKILLS` list. Each entry has:
+- `path` — path to the SKILL.md
+- `readonly` — boolean (default: false)
+- `config` — map of skill-specific config values
+
+If `USE_DEFAULTS` is true, set `CUSTOM_SKILLS` to `[]`.
+
 ---
 
 ## Step 3: Write Config File
@@ -321,6 +345,19 @@ scope:
     - "**/__tests__/**"
     - "**/__mocks__/**"
     - "**/node_modules/**"
+
+# Custom pipeline skills (added via /react-craft:init or manually)
+# See skills/references/custom-skill-contract.md for the contract
+pipeline:
+  custom_skills: [CUSTOM_SKILLS or []]
+  # Example:
+  # custom_skills:
+  #   - skill: custom
+  #     path: "examples/custom-skills/i18n-checker/SKILL.md"
+  #     readonly: true
+  #     config:
+  #       default_locale: "en-US"
+  #       frameworks: ["react-intl"]
 
 # How strictly react-craft enforces rules
 severity:

@@ -2,6 +2,7 @@
 name: story-author
 description: Creates Storybook 10 stories with interaction tests covering every state, variant, and edge case. Use after code generation and a11y audit in the react-craft pipeline.
 user-invocable: false
+version: 1.0.0
 ---
 
 # Story Author

@@ -2,6 +2,7 @@
 name: token-validator
 description: Detects hardcoded visual values (colors, spacing, typography, border-radius) where design tokens should be used. Suggests matching token replacements with confidence scores.
 user-invocable: false
+version: 1.0.0
 allowed-tools: Read, Glob, Grep
 ---
 

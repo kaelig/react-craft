@@ -1,0 +1,17 @@
+name: material-button
+design_system: material-design-3
+complexity: simple
+expected_agents:
+  - design-analyst
+  - component-architect
+  - code-writer
+  - accessibility-auditor
+  - story-author
+  - quality-gate
+expected_duration_seconds: 45
+tags:
+  - button
+  - interactive
+  - material
+  - variants
+  - icon-support

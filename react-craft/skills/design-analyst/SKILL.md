@@ -2,6 +2,7 @@
 name: design-analyst
 description: Extracts structured component specs from Figma designs, validates completeness, and produces component briefs. Use when processing Figma links, Anova YAML exports, or preparing component specifications for the react-craft pipeline.
 user-invocable: false
+version: 1.0.0
 ---
 
 # Design Analyst

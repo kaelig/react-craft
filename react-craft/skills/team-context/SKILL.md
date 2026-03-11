@@ -2,6 +2,7 @@
 name: team-context
 description: React-craft team structure, agent roles, and collaboration rules. Provides charter and roster for the multi-agent component pipeline.
 user-invocable: false
+version: 1.0.0
 ---
 
 # Team Context

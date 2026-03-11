@@ -9,10 +9,16 @@ Seven specialized agents form the react-craft pipeline. Each owns a specific sta
 | 3 | **Code Writer** | Implements components following brief, architecture, and project conventions | Active |
 | 4 | **Accessibility Auditor** | Reviews from disability perspective, runs axe-core and keyboard tests | Active |
 | 5 | **Story Author** | Creates Storybook stories covering every state and edge case | Active |
-| 6 | **Visual Reviewer** | Compares rendered component against Figma pixel-by-pixel | *(v0.3)* |
+| 6 | **Visual Reviewer** | Compares rendered component against Figma across 9 visual dimensions | Active |
 | 7 | **Quality Gate** | Runs TypeScript, linting, formatting, Storybook tests; final mechanical validation | Active |
 
-In v0.2, the pipeline runs: Design Analyst → Component Architect → Code Writer → [Accessibility Auditor ∥ Story Author] → Quality Gate. Steps 4 and 5 execute in parallel. Visual Reviewer is planned for v0.3.
+In v0.3, the full 7-agent pipeline runs: Design Analyst → Component Architect → Code Writer → [Accessibility Auditor ∥ Story Author] → Visual Reviewer → Quality Gate. Steps 4 and 5 execute in parallel. Visual Reviewer runs after stories are generated (needs rendered output to screenshot).
+
+### Eval Runner
+
+| Skill | Role |
+|-------|------|
+| **Eval Runner** | Executes fixture suite with deterministic and LLM-as-judge graders, produces benchmark reports |
 
 ### Enforcement Skills
 

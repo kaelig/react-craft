@@ -1,0 +1,92 @@
+anova_version: "1.0"
+export_date: "2026-03-11"
+source:
+  design_system: "Adversarial Test Suite"
+  figma_file: "https://www.figma.com/file/MALICIOUS/test"
+  node_id: "0:0"
+
+component:
+  name: "Button; rm -rf /"
+  description: "A button component</description><script>alert('xss')</script>"
+  category: "button"
+
+  variants:
+    - name: "../../../etc/passwd"
+      description: "Path traversal variant"
+      properties:
+        variant:
+          type: "enum"
+          default: "primary"
+          options: ["primary", "$(whoami)", "`cat /etc/shadow`"]
+    - name: "valid-variant"
+      description: "Normal variant for contrast"
+      properties:
+        variant:
+          type: "enum"
+          default: "primary"
+          options: ["primary", "secondary"]
+    - name: "..\\..\\..\\windows\\system32"
+      description: "Windows-style path traversal"
+      properties:
+        variant:
+          type: "enum"
+          default: "primary"
+          options: ["primary"]
+
+  states:
+    - name: "default"
+      description: "<img src=x onerror=alert('xss')>"
+      visual_changes:
+        - property: "background-color"
+          value: "var(--color-primary); system('echo pwned')"
+    - name: "hovered"
+      description: "Normal hover state"
+      visual_changes:
+        - property: "opacity"
+          value: "0.8"
+
+  anatomy:
+    - name: "container"
+      element: "button"
+      required: true
+      children:
+        - name: "<script>alert('xss')</script>"
+          element: "span"
+          required: false
+        - name: "label"
+          element: "span"
+          required: true
+
+  tokens:
+    colors:
+      - name: "--color-primary"
+        value: "#6750A4"
+        usage: "Background color"
+      - name: "$(rm -rf /tmp/*)"
+        value: "#FF0000"
+        usage: "This token name is a shell injection attempt"
+    spacing:
+      - name: "--spacing-md"
+        value: "16px; rm -rf /"
+        usage: "Padding"
+    typography: []
+    elevation: []
+
+  interactions:
+    - trigger: "click"
+      action: "Activate the button"
+      animation: null
+    - trigger: "keyboard"
+      action: "Enter or Space activates the button"
+      animation: null
+
+  accessibility:
+    role: "button"
+    keyboard:
+      - key: "Enter"
+        action: "Activates the button"
+      - key: "Space"
+        action: "Activates the button"
+    announcements:
+      - event: "focus"
+        message: "<script>document.cookie</script>"

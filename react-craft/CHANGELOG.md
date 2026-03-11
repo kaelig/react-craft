@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.3.0] - 2026-03-11
+
+### Added
+- **Visual Reviewer agent** — compares rendered Storybook stories against Figma designs across 9 visual dimensions (layout, typography, colors, spacing, shadows, borders, border-radius, icons, states) with iterative fix loop (max 5), Figma screenshot caching, diminishing-returns threshold, and no-regression checks
+- **`/react-craft:eval` command** — run fixture-based eval suite with deterministic graders (TypeScript, lint, axe-core, stories, no-any, JSDoc, enforcement match, sanitization) and LLM-as-judge graders (visual fidelity, API quality, code readability, DS compliance)
+- **Eval fixtures** — Material Button, Material Text Field, adversarial injection test cases, plus existing TaxCategoryPicker
+- **Custom pipeline skill slots** — plug custom validation skills (i18n, content strategy) into the pipeline via `pipeline.custom_skills` in config
+- **`--custom` flag for `/react-craft:audit`** — run custom pipeline skills alongside enforcement skills
+- **Agent prompt versioning** — `version` field in all agent SKILL.md frontmatter for eval reproducibility
+- **A/B testing** — `--compare` flag in `/react-craft:eval` for comparing eval runs across skill versions
+- **Custom skill contract** — documented contract for authoring pipeline-compatible skills
+
+### Changed
+- Build pipeline expanded from 6 agents to 7 (Visual Reviewer between Story Author and Quality Gate)
+- Global iteration budget increased from 10 to 12
+- Pipeline state schema includes visual-reviewer step
+- Progress reporting updated to (N/7) format
+- Completion summary includes Visual Review results
+- `/react-craft:init` now asks about custom skills
+- Best-effort mode handles Visual Reviewer CRITICAL findings
+
 ## [0.2.0] - 2026-03-11
 
 ### Added

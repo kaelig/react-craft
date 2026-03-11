@@ -1,0 +1,13 @@
+name: adversarial-injection
+design_system: adversarial-test-suite
+complexity: simple
+expected_agents:
+  - design-analyst
+expected_duration_seconds: 15
+tags:
+  - adversarial
+  - security
+  - sanitization
+  - shell-injection
+  - path-traversal
+  - xss
