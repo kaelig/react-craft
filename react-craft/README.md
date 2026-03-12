@@ -8,10 +8,17 @@ react-craft codifies 20 years of frontend expertise into a team of specialized A
 
 ### 1. Install the plugin
 
-Add react-craft to your Claude Code plugins:
+Install from GitHub (react-craft is not yet in the Claude Code marketplace):
 
 ```
-claude plugin add react-craft
+claude plugin add --from github kaelig/react-craft react-craft
+```
+
+Or clone locally and install from the filesystem:
+
+```bash
+git clone https://github.com/kaelig/react-craft.git
+claude plugin add --from local ./react-craft/react-craft
 ```
 
 ### 2. Initialize your project
