@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.3.1] - 2026-03-11
+
+### Added
+- **Compound Engineering integration** — `/react-craft:init` auto-detects CE plugin and configures `compound-engineering.local.md` with recommended review agents and react-craft review context
+- **CE integration guide** — `docs/ce-integration.md` maps CE agents to react-craft pipeline stages with setup instructions, recommended workflow, and troubleshooting
+- **`--ce=enabled` flag** for `/react-craft:init` — enables CE integration in non-interactive mode
+
+### Changed
+- README compatibility table now links to CE integration guide
+- `/init` summary includes CE integration status
+
 ## [0.3.0] - 2026-03-11
 
 ### Added

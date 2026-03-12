@@ -129,7 +129,7 @@ react-craft works standalone and integrates with other Claude Code plugins for e
 | Setup | What You Get |
 |-------|-------------|
 | **react-craft alone** | Full Figma-to-component pipeline with 7 agents |
-| **react-craft + CE** | Enhanced with Compound Engineering's orchestration and agent coordination |
+| **react-craft + CE** | Enhanced code review via CE agents. [Setup guide →](docs/ce-integration.md) |
 | **react-craft + BMAD** | Enhanced with BMAD's workflow management and project methodology |
 | **react-craft + CE + BMAD** | Full stack: methodology, orchestration, and component pipeline |
 

@@ -1,7 +1,7 @@
 ---
 name: react-craft:init
 description: Initialize a react-craft project — detects codebase conventions, writes config, and sets up CLAUDE.md instructions. Use when setting up react-craft in a new React project.
-argument-hint: "[--defaults] [--scope=src/components]"
+argument-hint: "[--defaults] [--scope=src/components] [--ce=enabled]"
 disable-model-invocation: true
 allowed-tools: Read, Bash(node *), Bash(npm *), Bash(npx *), Write, Edit, Glob, Grep
 ---
@@ -13,8 +13,9 @@ You are the react-craft init agent. Your job is to detect project conventions, w
 Parse the user's arguments:
 - `--defaults` — skip all interactive prompts, use detected or sensible defaults
 - `--scope=<path>` — override the default component scope directory (default: `src/components`)
+- `--ce=enabled` — enable Compound Engineering integration without prompting (useful with `--defaults`)
 
-Store parsed flags in your working memory as `USE_DEFAULTS` (boolean) and `SCOPE_DIR` (string).
+Store parsed flags in your working memory as `USE_DEFAULTS` (boolean), `SCOPE_DIR` (string), and `CE_FLAG` (string or null).
 
 ---
 
@@ -262,6 +263,10 @@ Record as `CUSTOM_SKILLS` list. Each entry has:
 
 If `USE_DEFAULTS` is true, set `CUSTOM_SKILLS` to `[]`.
 
+### 2i. Compound Engineering Detection
+
+Detect CE plugin by reading `~/.claude/plugins/installed_plugins.json` via `Bash(node ...)`. If detected, prompt to enable CE integration (skip with `--defaults`, force with `--ce=enabled`). Record `CE_ENABLED` for Step 4b. See `skills/references/ce-integration-steps.md` for the detection script and prompt logic.
+
 ---
 
 ## Step 3: Write Config File
@@ -422,6 +427,12 @@ Fill in `[STYLING_METHOD]`, `[REF_PATTERN]`, and `[SCOPE_DIR]` with the detected
 
 ---
 
+## Step 4b: Write CE Integration (if enabled)
+
+Only runs if `CE_ENABLED` is true (Step 2i). Write recommended agents and review context into `$CWD/compound-engineering.local.md` (project root — not `.claude/`). See `skills/references/ce-integration-steps.md` for the full procedure, YAML validation, marker-based idempotency, and security notes.
+
+---
+
 ## Step 5: Create Output Directories
 
 Create the docs output directory if it does not exist:
@@ -450,6 +461,7 @@ react-craft initialized successfully.
   Components dir: [SCOPE_DIR]
   Config file:    react-craft.config.yaml
   CLAUDE.md:      [updated | created]
+  CE integration: [enabled (2 review agents added) | skipped | not detected]
 
 Next steps:
   1. Edit `react-craft.config.yaml` — fill in the `design_system` section
